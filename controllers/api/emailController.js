@@ -1,4 +1,5 @@
 const Email = require("../../models/emailModel");
+const User = require("../../models/userModel");
 const axios = require("axios");
 require("dotenv").config();
 
@@ -274,9 +275,42 @@ async function confirmCheckin(req, res, next) {
 
 //and another function for the payload email for 24 hours
 
+//TESTING FUNCTION TO CREEATE STARTER DATA FOR EMAIL
+async function makeEmail(req, res, next) {
+	try {
+		const email = new Email({
+			toAddress: req.body.email,
+			emailBody: req.body.message,
+			emailSubject: req.body.subject,
+			password: req.body.password,
+			intervals: req.body.intervals,
+		});
+
+		await email.save();
+
+		let user = await User.findById({ _id: req.userId });
+
+		//need some error handling to check for dupes or something
+		user.userEmails.push(email._id);
+
+		await user.save();
+
+		res.json({
+			message: "successfully created email",
+			payload: user,
+		});
+	} catch (e) {
+		res.json({
+			message: "failed to create email",
+			payload: `failure ${e}`,
+		});
+	}
+}
+
 module.exports = {
 	createEmail,
 	sendCheckinEmail,
 	testFunction,
 	confirmCheckin,
+	makeEmail,
 };

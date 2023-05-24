@@ -1,9 +1,13 @@
 const mongoose = require("mongoose");
 
-const Schema = mongoose.Schema;
+// const Schema = mongoose.Schema;
 
 const emailSchema = new mongoose.Schema({
 	toAddress: {
+		type: String,
+		required: true,
+	},
+	emailSubject: {
 		type: String,
 		required: true,
 	},

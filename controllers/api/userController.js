@@ -1,6 +1,7 @@
 const User = require("../../models/userModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const Email = require("../../models/emailModel");
 
 //can make function to get all users later not rlly neccessary
 
@@ -91,14 +92,19 @@ async function signIn(req, res) {
 				// 	parload: userObj,
 				// });
 
-				const token = jwt.sign({ id: user._id }, "jwtSecret", {
-					expiresIn: 300,
-				});
+				const token = jwt.sign(
+					{ id: user._id },
+					process.env.ACCESS_TOKEN_SECRET,
+					{
+						expiresIn: 300,
+					}
+				);
 
 				res.json({
 					auth: true,
 					token: token,
-					user: user,
+					name: user.name,
+					email: user.email,
 				});
 			}
 		}
@@ -111,19 +117,42 @@ async function signIn(req, res) {
 }
 
 //DISPLAYING EMAIL INFORMATION FOR THE DASHBOARD
-async function getUserEmails(req, res, next) {}
+async function getAllUserEmails(req, res, next) {
+	try {
+		let user = await User.findById({ _id: req.userId });
+
+		let userEmails = [];
+
+		for (let i = 0; i < user.userEmails.length; i++) {
+			let oneEmail = await Email.findOne({ _id: user.userEmails[i] });
+			userEmails.push({
+				toAddress: oneEmail.toAddress,
+				subject: oneEmail.emailSubject,
+			});
+		}
+
+		res.json({ payload: userEmails });
+	} catch (e) {
+		res.json({
+			message: "failed to fetch user emails",
+			payload: `failed to get emails ${e}`,
+		});
+	}
+}
+
+//DISPLAYING ONE EMAIL
+// async function getOneEmail(req, res, next) {}
 
 //UPDATE USER INFORMATION
-async function updateUserInfo(req, res, next) {}
+// async function updateUserInfo(req, res, next) {}
 
 //DELETE USER AND ALL EMAILS
-async function deleteUserInfo(req, res, next) {}
+// async function deleteUserInfo(req, res, next) {}
 
 //LOGOUT FUNCTION
 
 module.exports = {
 	createUser,
 	signIn,
-	getUserEmails,
-	updateUserInfo,
+	getAllUserEmails,
 };
