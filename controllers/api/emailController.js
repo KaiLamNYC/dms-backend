@@ -10,7 +10,15 @@ const sgMail = require("@sendgrid/mail");
 const crypto = require("crypto");
 const CRON_API = process.env.CRONJOB_API_KEY;
 
-//function to create an email
+//THIS STARTS THE CHAIN OF EVENTS
+/*
+CREATES EMAIL DOCUMENT
+SAVES IT TO THE DATABASE WITH USER
+CREATES A CRONJOB FOR THE FIRST INTERVAL
+REMOVES FIRST INTERVAL
+CRONJOB POINTS TO SEND CHECKIN BACKEND ROUTE
+SAVES THE CRONJOB ID TO EMAIL DOCUMENT
+*/
 async function createEmail(req, res, next) {
 	try {
 		//first need to save the email
@@ -94,12 +102,22 @@ async function createEmail(req, res, next) {
 	}
 }
 
+/*
+CRONJOB HITS THIS ROUTE FOR CHECKINS AFTER CREATING EMAIL
+CREATES A UNIQUE CHECKIN PASSWORD
+SAVES IT TO THE EMAIL DOCUMENT FOR CHECKING LATER
+SENDS EMAIL WITH CHECKIN URL THAT CONTAINS UNIQUE PASSWORD
+CHECKIN URL IS A BACKEND ROUTE
+CREATES A CRONJOB THAT SENDS THE PAYLOAD AT 24H IF NO CHECKIN
+UPDATE THE EMAIL DOCUMENT WITH THE CORRECT CRONJOB ID FOR DEELTEION LATER
+
+*/
 async function sendCheckinEmail(req, res) {
 	try {
 		//need to do some error handling if no email found
 		const email = await Email.findById(req.body.emailID);
 
-		//create cronjob 24 hours from now using the emailid and emailid.interval
+		//create cronjob 24 hours from now for payload using the emailid and emailid.interval
 
 		const config = {
 			headers: {
@@ -193,21 +211,17 @@ async function sendCheckinEmail(req, res) {
 	}
 }
 
-async function testFunction(req, res) {
-	try {
-		const ranString = crypto.randomBytes(10);
-		res.json({
-			message: "success",
-			payload: ranString.toString("hex"),
-		});
-	} catch (err) {
-		res.json({
-			message: "failure",
-			payload: `test function failed ${err}`,
-		});
-	}
-}
-
+/* 
+VERY IMPORTANT
+HANDLES THE CHECK AND KEEPTS THE SWITCH RUNNING
+NEEDS TO CHECK FOR CORRECT CHECKIN PASSWORD
+IF NO PASSWORD SHOW ERROR SCREEN TO USER AND DONT CONFIRM CHECK IN
+IF PASSWORD IS CORRECT, DELETE 24 HOUR PAYLOAD USING CRONJOB ID FROM EMAIL DOCUMENT
+THEN CHECK THE EMAIL DOCUMENT FOR ANY INTERVALS LEFT
+CREATES A CRONJOB OR THE SEND CHECK IN BACKEND ROUTE USING THE REMAINING INTERVAL IF ANY
+IF NO INTERVAL THEN DELETE THE EMAIL DOCUMENT
+OR DO SOMETHING ELSE
+*/
 async function confirmCheckin(req, res, next) {
 	try {
 		const emailID = req.params.emailID;
@@ -270,10 +284,21 @@ async function confirmCheckin(req, res, next) {
 		});
 	}
 }
+/*
+ROUTE FOR USER TO DELETE THE EMAIL USING A PASSWORD THAT WAS SET AT THE CREATING OF THE EMAIL DOCUMENT
+TAKES IN THE USERS INPUT
+CHECKS IT AGAINST THE EMAIL HES CURRENTLY VIEWING
+IF MATCH THEN DELETE EMAIL DOCUMENT AND THE CORRESPONDING CRONJOB
+*/
+async function deleteEmail(req, res, next) {
+	try {
+	} catch (e) {}
+}
+
+//NEED A PAYLOAD FUNCTION TO ACTUALLY SEND THE EMAIL
+//MAYBE REFACTOR TO SEPARATE THE CREATING CRONJOB AND ID THING IDK
 
 //probably need a function to create the cronjob using an email id and the interval
-
-//and another function for the payload email for 24 hours
 
 //TESTING FUNCTION TO CREEATE STARTER DATA FOR EMAIL
 async function makeEmail(req, res, next) {
@@ -303,6 +328,21 @@ async function makeEmail(req, res, next) {
 		res.json({
 			message: "failed to create email",
 			payload: `failure ${e}`,
+		});
+	}
+}
+
+async function testFunction(req, res) {
+	try {
+		const ranString = crypto.randomBytes(10);
+		res.json({
+			message: "success",
+			payload: ranString.toString("hex"),
+		});
+	} catch (err) {
+		res.json({
+			message: "failure",
+			payload: `test function failed ${err}`,
 		});
 	}
 }

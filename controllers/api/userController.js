@@ -96,7 +96,7 @@ async function signIn(req, res) {
 					{ id: user._id },
 					process.env.ACCESS_TOKEN_SECRET,
 					{
-						expiresIn: 300,
+						expiresIn: "1d",
 					}
 				);
 
@@ -128,6 +128,7 @@ async function getAllUserEmails(req, res, next) {
 			userEmails.push({
 				toAddress: oneEmail.toAddress,
 				subject: oneEmail.emailSubject,
+				id: oneEmail._id,
 			});
 		}
 
@@ -141,8 +142,23 @@ async function getAllUserEmails(req, res, next) {
 }
 
 //DISPLAYING ONE EMAIL
-// async function getOneEmail(req, res, next) {}
+async function getOneEmail(req, res, next) {
+	try {
+		let email = await Email.findOne({ _id: req.params.emailId });
+		res.json({
+			payload: { toAddress: email.toAddress, subject: email.emailSubject },
+		});
 
+		res.json({
+			message: "success bro",
+		});
+	} catch (e) {
+		res.json({
+			message: "error getting one email",
+			payload: `error fetching one email ${e}`,
+		});
+	}
+}
 //UPDATE USER INFORMATION
 // async function updateUserInfo(req, res, next) {}
 
@@ -155,4 +171,5 @@ module.exports = {
 	createUser,
 	signIn,
 	getAllUserEmails,
+	getOneEmail,
 };
