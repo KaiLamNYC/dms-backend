@@ -6,6 +6,7 @@ const {
 	signIn,
 	getAllUserEmails,
 	getOneEmail,
+	getUserInfo,
 	// updateUserInfo,
 } = require("../../controllers/api/userController");
 const verifyJWT = require("../../controllers/middleware/verifyJWT");
@@ -17,6 +18,8 @@ router.post("/sign-in", signIn);
 router.get("/get-emails", verifyJWT, getAllUserEmails);
 
 router.get("/get-one-email/:emailId", getOneEmail);
+
+router.get("/get-user", verifyJWT, getUserInfo);
 
 // router.put("/update-user-info", verifyJWT, updateUserInfo);
 

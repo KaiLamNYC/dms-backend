@@ -148,10 +148,6 @@ async function getOneEmail(req, res, next) {
 		res.json({
 			payload: { toAddress: email.toAddress, subject: email.emailSubject },
 		});
-
-		res.json({
-			message: "success bro",
-		});
 	} catch (e) {
 		res.json({
 			message: "error getting one email",
@@ -159,17 +155,41 @@ async function getOneEmail(req, res, next) {
 		});
 	}
 }
+
+//GET USER INFORMATION FOR ACCOUNT PAGE
+async function getUserInfo(req, res, next) {
+	try {
+		let user = await User.findById({ _id: req.userId });
+		let firstName = user.name.split(" ")[0];
+		let lastName = user.name.split(" ")[1];
+		let currentUser = {
+			email: user.email,
+			firstName,
+			lastName,
+		};
+		res.json({
+			payload: currentUser,
+		});
+	} catch (e) {
+		res.json({
+			message: "error getting user information",
+			payload: `error getting user ${e}`,
+		});
+	}
+}
+
 //UPDATE USER INFORMATION
 // async function updateUserInfo(req, res, next) {}
 
+//UPDATE USER PASSWORD
+
 //DELETE USER AND ALL EMAILS
 // async function deleteUserInfo(req, res, next) {}
-
-//LOGOUT FUNCTION
 
 module.exports = {
 	createUser,
 	signIn,
 	getAllUserEmails,
 	getOneEmail,
+	getUserInfo,
 };
