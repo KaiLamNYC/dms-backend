@@ -179,11 +179,66 @@ async function getUserInfo(req, res, next) {
 }
 
 //UPDATE USER INFORMATION
-// async function updateUserInfo(req, res, next) {}
+async function updateUserInfo(req, res, next) {
+	try {
+		let user = await User.findByIdAndUpdate(req.userId, req.body, {
+			new: true,
+		});
+
+		res.json({
+			messsage: "success",
+			payload: user,
+		});
+	} catch (e) {
+		res.json({
+			message: "failed to udpdate user",
+			payload: `failed to update user ${e}`,
+		});
+	}
+}
 
 //UPDATE USER PASSWORD
+async function updateUserPassword(req, res, next) {
+	try {
+		let user = await User.findById({ _id: req.userId });
 
-//DELETE USER AND ALL EMAILS
+		let comparedPassword = await bcrypt.compare(
+			req.body.oldPassword,
+			user.password
+		);
+
+		if (!comparedPassword) {
+			res.json({
+				message: "failed to update user password",
+				payload: "old password does not match",
+			});
+		} else if (req.body.newPassword != req.body.confirmPassword) {
+			res.json({
+				message: "failed to update user password",
+				payload: "new passwords do not match",
+			});
+		} else {
+			//ALL PASSWORDS MATCH, THEREFORE UPDATE PASSWORD
+			let salt = await bcrypt.genSalt(10);
+			let hashedPassword = await bcrypt.hash(req.body.newPassword, salt);
+
+			user.password = hashedPassword;
+			user.save();
+
+			res.json({
+				message: "successfully updated user password",
+				payload: user,
+			});
+		}
+	} catch (e) {
+		res.json({
+			message: "failed to udpdate user",
+			payload: `failed to update user ${e}`,
+		});
+	}
+}
+
+//DELETE USER AND ALL EMAILS AND ALL CRONJOBS
 // async function deleteUserInfo(req, res, next) {}
 
 module.exports = {
@@ -192,4 +247,6 @@ module.exports = {
 	getAllUserEmails,
 	getOneEmail,
 	getUserInfo,
+	updateUserInfo,
+	updateUserPassword,
 };

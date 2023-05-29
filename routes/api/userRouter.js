@@ -7,7 +7,8 @@ const {
 	getAllUserEmails,
 	getOneEmail,
 	getUserInfo,
-	// updateUserInfo,
+	updateUserInfo,
+	updateUserPassword,
 } = require("../../controllers/api/userController");
 const verifyJWT = require("../../controllers/middleware/verifyJWT");
 
@@ -21,6 +22,7 @@ router.get("/get-one-email/:emailId", getOneEmail);
 
 router.get("/get-user", verifyJWT, getUserInfo);
 
-// router.put("/update-user-info", verifyJWT, updateUserInfo);
+router.put("/update-user-info", verifyJWT, updateUserInfo);
 
+router.put("/update-user-password", verifyJWT, updateUserPassword);
 module.exports = router;
