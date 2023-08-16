@@ -7,6 +7,7 @@ const {
 	testFunction,
 	confirmCheckin,
 	makeEmail,
+	deleteEmail,
 } = require("../../controllers/api/emailController");
 
 const verifyJWT = require("../../controllers/middleware/verifyJWT");
@@ -21,5 +22,7 @@ router.post("/confirm-checkin/:uniqueID/:emailID", confirmCheckin);
 
 //TEST ROUTE TO CREATE EMAIL ONLY
 router.post("/make-email", verifyJWT, makeEmail);
+
+router.delete("/delete-email/:emailID", verifyJWT, deleteEmail);
 
 module.exports = router;

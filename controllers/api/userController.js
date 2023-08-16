@@ -120,6 +120,7 @@ async function signIn(req, res) {
 async function getAllUserEmails(req, res, next) {
 	try {
 		let user = await User.findById({ _id: req.userId });
+		// let user = await User.findById({ _id: req.body.userId });
 
 		let userEmails = [];
 
@@ -144,9 +145,14 @@ async function getAllUserEmails(req, res, next) {
 //DISPLAYING ONE EMAIL
 async function getOneEmail(req, res, next) {
 	try {
+		//NEED SOME ERROR HANDLING TO CHECK IF THE USER.EMAILS CONTAINS THE ID FIRST
 		let email = await Email.findOne({ _id: req.params.emailId });
 		res.json({
-			payload: { toAddress: email.toAddress, subject: email.emailSubject },
+			payload: {
+				toAddress: email.toAddress,
+				subject: email.emailSubject,
+				intervals: email.intervals,
+			},
 		});
 	} catch (e) {
 		res.json({

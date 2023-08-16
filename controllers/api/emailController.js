@@ -42,7 +42,7 @@ async function createEmail(req, res, next) {
 		const config = {
 			headers: {
 				"Content-Type": "application/json",
-				//NEED TO REPLACE WITH PROCESS.ENV FOR CRONJOB KEY
+
 				Authorization: `Bearer ${CRON_API}`,
 			},
 		};
@@ -287,12 +287,36 @@ async function confirmCheckin(req, res, next) {
 /*
 ROUTE FOR USER TO DELETE THE EMAIL USING A PASSWORD THAT WAS SET AT THE CREATING OF THE EMAIL DOCUMENT
 TAKES IN THE USERS INPUT
-CHECKS IT AGAINST THE EMAIL HES CURRENTLY VIEWING
+CHECKS IT AGAINST THE EMAIL CURRENTLY VIEWING
 IF MATCH THEN DELETE EMAIL DOCUMENT AND THE CORRESPONDING CRONJOB
 */
 async function deleteEmail(req, res, next) {
 	try {
-	} catch (e) {}
+		let emailID = req.params.emailID;
+		let user = await User.findById({ _id: req.userId });
+
+		let email = await Email.findById({ _id: emailID });
+
+		if (email.password === req.body.emailPassword) {
+			await Email.deleteOne({ _id: emailID });
+			//removing email id from user
+			let foundEmailInUser = user.userEmails.indexOf(emailID);
+			user.userEmails.splice(foundEmailInUser, 1);
+			await user.save();
+			res.json({
+				payload: "success",
+			});
+		} else {
+			res.json({
+				message: "password doesnt match",
+			});
+		}
+	} catch (e) {
+		res.json({
+			message: "failed to delete email",
+			payload: `failure ${e}`,
+		});
+	}
 }
 
 //NEED A PAYLOAD FUNCTION TO ACTUALLY SEND THE EMAIL
@@ -353,4 +377,5 @@ module.exports = {
 	testFunction,
 	confirmCheckin,
 	makeEmail,
+	deleteEmail,
 };
