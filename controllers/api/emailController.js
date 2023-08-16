@@ -299,10 +299,12 @@ async function deleteEmail(req, res, next) {
 
 		if (email.password === req.body.emailPassword) {
 			await Email.deleteOne({ _id: emailID });
-			//removing email id from user
+
 			let foundEmailInUser = user.userEmails.indexOf(emailID);
 			user.userEmails.splice(foundEmailInUser, 1);
 			await user.save();
+
+			//NEED TO HANDLE DELETING CRONJOB
 			res.json({
 				payload: "success",
 			});
