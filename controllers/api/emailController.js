@@ -308,7 +308,8 @@ async function deleteEmail(req, res, next) {
 			});
 		} else {
 			res.json({
-				message: "password doesnt match",
+				message: "error",
+				payload: "Incorrect Password!",
 			});
 		}
 	} catch (e) {

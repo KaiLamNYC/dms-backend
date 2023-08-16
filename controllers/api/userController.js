@@ -63,7 +63,11 @@ async function signIn(req, res) {
 
 		if (!user) {
 			///DO SOMETHING NEED TO REDIRECT WITH ERRORS
-			throw new Error("User not found please sign up");
+			// throw new Error("User not found please sign up");
+			res.json({
+				message: "error",
+				payload: "User not found!",
+			});
 		} else {
 			let comparedPassword = await bcrypt.compare(
 				req.body.password,
@@ -71,7 +75,11 @@ async function signIn(req, res) {
 			);
 
 			if (!comparedPassword) {
-				throw new Error("Please check your email and password");
+				// throw new Error("Please check your email and password");
+				res.json({
+					message: "error",
+					payload: "Incorrect Password!",
+				});
 			} else {
 				//ALL INFO IS CORRECT CONTINUE TO LOGIN
 
