@@ -37,18 +37,13 @@ async function createUser(req, res, next) {
 
 		// await User.create(newUserObj)
 
-		//FLASH SUCCESS MESSAGE
-		//REDIRECT TO LOGIN PAGE
-		// res.redirect("/sign-in");
-		//can just send a regular back end response for now
+		
 		res.json({
 			message: "success",
 			payload: createdUser,
 		});
 	} catch (e) {
-		//need to do some sort of error handling or validation in the form
-		//HANDLE ERRORS AND FORM VALIDATION FROM FRONTEND
-		//STAY ON SIGN UP PAGE
+	
 		res.json({
 			message: "failure",
 			payload: `failed to create user ${e}`,

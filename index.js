@@ -10,7 +10,6 @@ const cors = require("cors");
 // const mongoose = require("mongoose");
 // const MongoStore = require("connect-mongo");
 
-//function to connect to mongo database
 const connectToMongoDB = require("./database/mongodb");
 require("dotenv").config();
 
