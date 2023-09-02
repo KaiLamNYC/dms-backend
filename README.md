@@ -28,7 +28,7 @@ The Deadman's Switch is a powerful full-stack application designed to provide us
 
 - **Peace of Mind**: For anyone who wants peace of mind knowing that there's a reliable method to communicate important information in case of unexpected events.
 
-The Deadman's Switch project combines backend functionality powered by Python, Flask, and SQLAlchemy with a frontend developed using JavaScript, HTML, and CSS. It leverages SMTP for email communication and SQLite for data storage, ensuring a robust and secure communication tool.
+The Deadman's Switch project combines backend functionality utilizing Twilio SendGrid, cron-job.org for scheduling, MongoDB for data storage, and JWT for authentication with a frontend developed using Next.js and styled with Tailwind CSS, creating a robust and secure communication tool for various scenarios.
 
 ## Libraries Used
 
